@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'signup_screen.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class SignupScreen extends StatelessWidget {
+  const SignupScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +27,7 @@ class LoginScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(
-                  'My Drive',
+                  'Create Account',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -36,6 +35,14 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 48),
+                const TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Name',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.person),
+                  ),
+                ),
+                const SizedBox(height: 16),
                 const TextField(
                   decoration: InputDecoration(
                     labelText: 'Email',
@@ -59,25 +66,17 @@ class LoginScreen extends StatelessWidget {
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      foregroundColor: Colors.white,
                     ),
-                    child: const Text(
-                      'Login',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
+                    child: const Text('Sign Up'),
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SignupScreen(),
-                      ),
-                    );
+                    Navigator.pop(context);
                   },
-                  child: const Text('Don\'t have an account? Sign up'),
+                  child: const Text('Already have an account? Login'),
                 ),
               ],
             ),
