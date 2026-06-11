@@ -49,6 +49,30 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _confirmDelete(FileObject file) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete File'),
+        content: Text('Delete ${file.name}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await _storageService.deleteFile(file.name);
+              _loadFiles();
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,29 +127,33 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: _files.length,
               itemBuilder: (context, index) {
                 final file = _files[index];
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.insert_drive_file,
-                        size: 40,
-                        color: Colors.blue,
-                      ),
-                      const SizedBox(height: 8),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: Text(
-                          file.name,
-                          style: const TextStyle(fontSize: 12),
-                          overflow: TextOverflow.ellipsis,
+                return GestureDetector(
+                  onLongPress: () => _confirmDelete(file),
+                  onSecondaryTap: () => _confirmDelete(file),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.insert_drive_file,
+                          size: 40,
+                          color: Colors.blue,
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 8),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: Text(
+                            file.name,
+                            style: const TextStyle(fontSize: 12),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
