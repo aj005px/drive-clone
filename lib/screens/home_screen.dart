@@ -1,7 +1,51 @@
 import 'package:flutter/material.dart';
+import '../services/storage_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final _storageService = StorageService();
+  List<FileObject> _files = [];
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFiles();
+  }
+
+  Future<void> _loadFiles() async {
+    setState(() => _isLoading = true);
+    try {
+      final files = await _storageService.getFiles();
+      setState(() => _files = files);
+    } catch (e) {
+      print('Error loading files: $e');
+    }
+    setState(() => _isLoading = false);
+  }
+
+  Future<void> _uploadFile() async {
+    try {
+      final url = await _storageService.uploadFile();
+      if (url != null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('File uploaded!')));
+        _loadFiles();
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,33 +63,59 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(16),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-        ),
-        itemCount: 6,
-        itemBuilder: (context, index) {
-          return Container(
-            decoration: BoxDecoration(
-              color: Colors.blue.shade50,
-              borderRadius: BorderRadius.circular(12),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _files.isEmpty
+          ? const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.cloud_upload, size: 80, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text('No files yet', style: TextStyle(color: Colors.grey)),
+                  Text('Tap + to upload', style: TextStyle(color: Colors.grey)),
+                ],
+              ),
+            )
+          : GridView.builder(
+              padding: const EdgeInsets.all(16),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+              ),
+              itemCount: _files.length,
+              itemBuilder: (context, index) {
+                final file = _files[index];
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.insert_drive_file,
+                        size: 40,
+                        color: Colors.blue,
+                      ),
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Text(
+                          file.name,
+                          style: const TextStyle(fontSize: 12),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.insert_drive_file, size: 40, color: Colors.blue),
-                SizedBox(height: 8),
-                Text('File.pdf', style: TextStyle(fontSize: 12)),
-              ],
-            ),
-          );
-        },
-      ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: _uploadFile,
         child: const Icon(Icons.add),
       ),
     );
