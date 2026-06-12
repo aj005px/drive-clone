@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../services/storage_service.dart';
 import '../services/auth_service.dart';
 import 'login_screen.dart';
@@ -73,6 +74,80 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _shareFile(FileObject file) {
+    final url = _storageService.getFileUrl(file.name);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Share File'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              file.name,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            SelectableText(
+              url,
+              style: const TextStyle(fontSize: 12, color: Colors.blue),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: url));
+              Navigator.pop(context);
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Link copied!')));
+            },
+            child: const Text('Copy Link'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showContextMenu(TapDownDetails details, FileObject file) {
+    showMenu(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        details.globalPosition.dx,
+        details.globalPosition.dy,
+        details.globalPosition.dx,
+        details.globalPosition.dy,
+      ),
+      items: [
+        PopupMenuItem(
+          onTap: () => _shareFile(file),
+          child: const Row(
+            children: [
+              Icon(Icons.share, size: 20),
+              SizedBox(width: 8),
+              Text('Share'),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          onTap: () => _confirmDelete(file),
+          child: const Row(
+            children: [
+              Icon(Icons.delete, size: 20, color: Colors.red),
+              SizedBox(width: 8),
+              Text('Delete', style: TextStyle(color: Colors.red)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,8 +203,10 @@ class _HomeScreenState extends State<HomeScreen> {
               itemBuilder: (context, index) {
                 final file = _files[index];
                 return GestureDetector(
+                  onTap: () => _shareFile(file),
                   onLongPress: () => _confirmDelete(file),
-                  onSecondaryTap: () => _confirmDelete(file),
+                  onSecondaryTapDown: (details) =>
+                      _showContextMenu(details, file),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.blue.shade50,

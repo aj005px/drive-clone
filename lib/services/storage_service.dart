@@ -35,4 +35,9 @@ class StorageService {
     final userId = supabase.auth.currentUser!.id;
     await supabase.storage.from('files').remove(['$userId/$fileName']);
   }
+
+  String getFileUrl(String fileName) {
+    final userId = supabase.auth.currentUser!.id;
+    return supabase.storage.from('files').getPublicUrl('$userId/$fileName');
+  }
 }
