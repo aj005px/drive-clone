@@ -1,17 +1,23 @@
-# drive_clone
+# My Drive 📁
 
-A new Flutter project.
+A Google Drive clone built with Flutter and Supabase.
 
-## Getting Started
+## Features
+- 🔐 User authentication (signup/login)
+- 📤 File upload to cloud storage
+- 🗂️ File management with grid view
+- 🗑️ Delete files (long press or right click)
+- 🔗 Share file links (copy to clipboard)
+- 🚪 Logout
 
-This project is a starting point for a Flutter application.
+## Tech Stack
+- **Flutter** — cross platform UI framework
+- **Dart** — programming language
+- **Supabase** — open source backend (auth + storage)
+- **file_picker** — native file selection
+- **flutter_dotenv** — secure environment variables
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Setup
+1. Clone the repo
+2. Create a Supabase project at supabase.com
+3. Create a `.env` file:
